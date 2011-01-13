@@ -9,6 +9,8 @@
 package mobileup.android;
 
 import android.provider.ContactsContract.Data;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.provider.ContactsContract.CommonDataKinds.Nickname;
 import android.database.Cursor;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -159,36 +161,54 @@ public class PhoneHandler extends Handler
 
 	String[] projection = new String[] {
 	    Data._ID,
-	    "label",
-	    "number"
+	    Data.DISPLAY_NAME,
+	    Data.RAW_CONTACT_ID,
+	    Data.MIMETYPE,
+	    Phone.NUMBER,
 	};
 	// Make the query. 
 	Cursor cur = cr.query(Data.CONTENT_URI,
 			      projection, // Which columns to return 
-			      null,       // Which rows to return (all rows)
+			      Data.MIMETYPE + "='" + Phone.CONTENT_ITEM_TYPE + "'", //+ "' or " + Data.MIMETYPE + "='" + Nickname.CONTENT_ITEM_TYPE + "'",
 			      null,       // Selection arguments (none)
 			      // Put the results in ascending order by name
-			      "label ASC");
+			      Data.DISPLAY_NAME + " ASC");
 
-	int nameColumn = cur.getColumnIndex("label"); 
-        int phoneColumn = cur.getColumnIndex("number");
+	int nameColumn = cur.getColumnIndex(Data.DISPLAY_NAME); 
+        int phoneColumn = cur.getColumnIndex(Phone.NUMBER);
+	int rcColumn = cur.getColumnIndex(Data.RAW_CONTACT_ID);
+	int mimeColumn = cur.getColumnIndex(Data.MIMETYPE);
+	Log.d("PhoneHandler", "Columns " + nameColumn + ", " + phoneColumn);
 	JSONArray contactList = new JSONArray();
 	if(cur.moveToFirst()) {
 	    do {
+		long rawId = cur.getLong(rcColumn);
+		String mime = cur.getString(mimeColumn);
 		String name = cur.getString(nameColumn);
 		String phone = cur.getString(phoneColumn);
-		if(phone != null) {
+
+		Log.d("PhoneHandler", "Row " + rawId + ", " + name + ", " + phone);
+		if(mime != null) {
 		    JSONObject entry = new JSONObject();
 		    try {
-			entry.put("name", name);
+			entry.put("rawID", rawId);
 		    } catch (JSONException e) {
-			Log.e("Phone", "json error on name" + name + " " + phone);
+			Log.e("Phone", "json error on raw id " + rawId);
 		    }
-		    try {
-			entry.put("phone", phone);
-		    } catch (JSONException e) {
-			Log.e("Phone", "json error on phone " + name + " " + phone);
-		    }
+
+		    //if(mime.equals(Nickname.CONTENT_ITEM_TYPE)) {
+			try {
+			    entry.put("name", name);
+			} catch (JSONException e) {
+			    Log.e("Phone", "json error on name" + name);
+			}			
+			//} else {
+			try {
+			    entry.put("phone", phone);
+			} catch (JSONException e) {
+			    Log.e("Phone", "json error on phone " + phone);
+			}
+			//}
 		    contactList.put(entry);
 		}
 	    } while(cur.moveToNext());

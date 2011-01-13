@@ -1,5 +1,4 @@
 package superisaac.mobileup.demo;
-
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -22,10 +21,18 @@ import android.content.Intent;
 import android.content.Context;
 import android.util.Log;
 
+import mobileup.web.HttpProtocol;
+import mobileup.web.Processor;
+import mobileup.web.FileProcessor;
+import mobileup.sensorweb.WireProcessor;
 import mobileup.sensorweb.HandlerFactory;
+import mobileup.network.Protocol;
+import mobileup.network.IFactory;
+
 import mobileup.android.SensorContext;
 import mobileup.android.Util;
 import mobileup.android.CustomWebView;
+import mobileup.android.AssetProcessor;
 import mobileup.json.*;
 
 public class Demo extends Activity
@@ -125,9 +132,32 @@ public class Demo extends Activity
     public void startService() {
 	if(sensorContext != null) { // && sensorContext.checkRunning() != 0) {
 	    Log.d("Main", "start running");
-	    sensorContext.start();
+	    SensorFactory factory = new SensorFactory();
+	    factory.context = this;
+	    sensorContext.start(factory);
 	    CustomWebView browser = (CustomWebView)findViewById(R.id.content_view);
 	    browser.loadUrl("http://localhost:5899");
 	}
     }
 };
+
+class SensorProtocol extends HttpProtocol
+{
+    public Processor route() {
+	if(object.equals("/websockets")){
+	    return new WireProcessor();
+	} else if(object.startsWith("/sd/")){
+	    return new FileProcessor("/sdcard", "/sd");	    
+	}
+	SensorFactory sf = (SensorFactory)factory;
+        return new AssetProcessor(sf.context.getAssets());
+	//return new FileProcessor("/sdcard/www");
+    }
+}
+
+class SensorFactory implements IFactory {
+    public Context context;
+    public Protocol buildProtocol() {
+	return new SensorProtocol();
+    }
+}

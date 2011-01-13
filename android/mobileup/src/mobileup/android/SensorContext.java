@@ -18,10 +18,7 @@ import mobileup.network.IFactory;
 import mobileup.sensorweb.WireProcessor;
 import mobileup.sensorweb.Queue;
 import mobileup.sensorweb.QueueManager;
-import mobileup.web.AckProcessor;
-import mobileup.web.HttpProtocol;
-import mobileup.web.Processor;
-import mobileup.web.FileProcessor;
+
 import android.hardware.SensorManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEventListener;
@@ -92,27 +89,6 @@ class SensorQueue extends Queue implements SensorEventListener
     }
 }
 
-class SensorProtocol extends HttpProtocol
-{
-    public Processor route() {
-	if(object.equals("/websockets")){
-	    return new WireProcessor();
-	} else if(object.startsWith("/sd/")){
-	    return new FileProcessor("/sdcard", "/sd");	    
-	}
-	//SensorFactory sf = (SensorFactory)factory;
-        //return new AssetProcessor(sf.context.getAssets());
-	return new FileProcessor("/sdcard/www");
-    }
-}
-
-class SensorFactory implements IFactory {
-    public Context context;
-    public Protocol buildProtocol() {
-	return new SensorProtocol();
-    }
-}
-
 public class SensorContext extends HandlerFactory
 {
     private Context context;
@@ -128,13 +104,11 @@ public class SensorContext extends HandlerFactory
 	this.context = null;
     }
 
-    public int start() {
+    public int start(IFactory factory) {
 	mobileup.util.Log.registerLogger(new Logger());
 	
 	Reactor reactor = Reactor.getInstance();
 	try {
-	    SensorFactory factory = new SensorFactory();
-	    factory.context = context;
 	    reactor.listen(null, 5899, factory);
 	    reactor.start();
 	}catch(IOException e) {
