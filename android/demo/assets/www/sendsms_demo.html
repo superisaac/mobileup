@@ -1,0 +1,22 @@
+<html>
+  <head>
+    <title>Demo: send sms message</title>
+    <script type="text/javascript" src="mobileup.js"></script>
+    <script type="text/javascript" src="demo.js"></script>
+  </head>
+  <body onload="on_send_sms_init();">
+    <h3>
+      <a href="/">HOME</a> |
+      Send SMS
+    </h3>
+    <div id="board">
+      <label for="phone">Phone:</label><br/>
+      <input type="text" name="phone" id="id_phone" value=""/><br/>
+      <label for="text">Text:</label><br/>
+      <textarea name="text" id="id_text"></textarea><br/>
+      <a id="command" 
+	 href="javascript:void(0);" 
+	 onclick="send_sms();">Send</a>
+    </div>
+  </body>
+</html>

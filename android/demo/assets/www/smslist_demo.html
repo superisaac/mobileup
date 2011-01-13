@@ -1,0 +1,30 @@
+<html>
+  <head>
+    <title>Demo: file explorer</title>
+    <script type="text/javascript" src="mobileup.js"></script>
+    <script type="text/javascript" src="demo.js"></script>
+  </head>
+
+  <body onload="on_sms_list_init();">
+    <h3>
+      <a href="/">HOME</a> |
+      Sms explorer
+      <a id="command" 
+	 href="javascript:void(0);" 
+	 onclick="listsms();">List</a>
+
+    </h3>
+    <div id="board">
+      <center id="paginator">
+	<a href="javascript:void(0);" onclick="prev_page();">Prev</a> |
+	<a href="javascript:void(0);" onclick="next_page();">Next</a>
+      </center>
+     <ul id="sms-list">
+     </ul>
+      <center id="paginator">
+	<a href="javascript:void(0);" onclick="prev_page();">Prev</a> |
+	<a href="javascript:void(0);" onclick="next_page();">Next</a>
+      </center>
+    </div>
+  </body>
+</html>
