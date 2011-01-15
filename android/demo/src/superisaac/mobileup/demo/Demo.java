@@ -47,7 +47,6 @@ public class Demo extends Activity
 	Log.d("Main", "Activity on Create");
 
 	mMobileUp = new MobileUpContext(this);
-	HandlerFactory.instance = mMobileUp;
 
 	if(mainView == null) {
 	    mainView = findViewById(R.layout.main);

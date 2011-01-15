@@ -6,6 +6,7 @@
  *   http://www.gnu.org/licenses/gpl.html
  *
  **/
+
 package mobileup.android;
 import java.io.IOException;
 
@@ -98,6 +99,7 @@ public class MobileUpContext extends HandlerFactory
 	this.context = context;
 	sensorManager = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
 	SystemHandler.docRoot = "/sdcard";
+	HandlerFactory.instance = this;
     }
 
     public void detach() {
