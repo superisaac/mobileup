@@ -104,12 +104,17 @@ public class SensorContext extends HandlerFactory
 	this.context = null;
     }
 
-    public int start(IFactory factory) {
+    public int start(int port) {
+	AssetFactory factory = new AssetFactory(this.context);
+	return start(factory, port);
+    }
+
+    public int start(IFactory factory, int port) {
 	mobileup.util.Log.registerLogger(new Logger());
 	
 	Reactor reactor = Reactor.getInstance();
 	try {
-	    reactor.listen(null, 5899, factory);
+	    reactor.listen(null, port, factory);
 	    reactor.start();
 	}catch(IOException e) {
 	    e.printStackTrace();
@@ -125,11 +130,6 @@ public class SensorContext extends HandlerFactory
 	reactor.kill();
 	Log.d("SensorContext", "on stop");
 	return 1;
-    }
-
-    public int checkRunning() {
-	Reactor reactor = Reactor.getInstance();
-	return reactor.isRunning()? 1: 0;
     }
 
     private void addSensorQueue(String name, SensorQueue q) {

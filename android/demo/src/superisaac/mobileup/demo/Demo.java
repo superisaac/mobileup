@@ -22,23 +22,20 @@ import android.content.Context;
 import android.util.Log;
 
 import mobileup.web.HttpProtocol;
-import mobileup.web.Processor;
-import mobileup.web.FileProcessor;
-import mobileup.sensorweb.WireProcessor;
+
+
 import mobileup.sensorweb.HandlerFactory;
-import mobileup.network.Protocol;
 import mobileup.network.IFactory;
 
-import mobileup.android.SensorContext;
+import mobileup.android.MobileUpContext;
 import mobileup.android.Util;
 import mobileup.android.CustomWebView;
-import mobileup.android.AssetProcessor;
 import mobileup.json.*;
 
 public class Demo extends Activity
 {
     View mainView;
-    SensorContext sensorContext;
+    MobileUpContext mMobileUp;
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -49,8 +46,8 @@ public class Demo extends Activity
 	setContentView(R.layout.main);
 	Log.d("Main", "Activity on Create");
 
-	sensorContext = new SensorContext(this);
-	HandlerFactory.instance = sensorContext;
+	mMobileUp = new MobileUpContext(this);
+	HandlerFactory.instance = mMobileUp;
 
 	if(mainView == null) {
 	    mainView = findViewById(R.layout.main);
@@ -81,40 +78,17 @@ public class Demo extends Activity
     public void onRestoreInstanceState(Bundle savedState) {
 	CustomWebView browser = (CustomWebView)findViewById(R.id.content_view);
 	browser.restoreState(savedState);
-	/*ViewWebSocketFactory wsFactory = new ViewWebSocketFactory(browser);
-	  browser.addJavascriptInterface(wsFactory, "WebSocketFactory"); */
     }
 
-
-    @Override
-    public void onStart() {
-	super.onStart();
-    }
-
-    @Override
-    public void onStop() {
-	super.onStop();
-    }
 
     @Override
     public void onDestroy() {
 	Log.d("Main", "Activity on Destroy");
 	//unbindService(this);
-	sensorContext.detach();
+	mMobileUp.detach();
 	super.onDestroy();
     }
     
-    @Override
-    public void onResume() {
-	Log.d("Main", "Activity on Resume");
-	super.onResume();
-    }
-
-    @Override
-    public void onPause() {
-	super.onPause();
-    }	
-
     public void onServiceControl(View v) {
 	CheckBox cb = (CheckBox)v;
 	if(cb.isChecked()) {
@@ -124,40 +98,18 @@ public class Demo extends Activity
 	}
     }
     public void stopService() {
-	if(sensorContext != null) {
-	    sensorContext.stop();
+	if(mMobileUp != null) {
+	    mMobileUp.stop();
 	}
     }
 
     public void startService() {
-	if(sensorContext != null) { // && sensorContext.checkRunning() != 0) {
+	if(mMobileUp != null) { // && mMobileUp.checkRunning() != 0) {
 	    Log.d("Main", "start running");
-	    SensorFactory factory = new SensorFactory();
-	    factory.context = this;
-	    sensorContext.start(factory);
+	    mMobileUp.start(5899);
 	    CustomWebView browser = (CustomWebView)findViewById(R.id.content_view);
 	    browser.loadUrl("http://localhost:5899");
 	}
     }
 };
 
-class SensorProtocol extends HttpProtocol
-{
-    public Processor route() {
-	if(object.equals("/websockets")){
-	    return new WireProcessor();
-	} else if(object.startsWith("/sd/")){
-	    return new FileProcessor("/sdcard", "/sd");	    
-	}
-	SensorFactory sf = (SensorFactory)factory;
-        return new AssetProcessor(sf.context.getAssets());
-	//return new FileProcessor("/sdcard/www");
-    }
-}
-
-class SensorFactory implements IFactory {
-    public Context context;
-    public Protocol buildProtocol() {
-	return new SensorProtocol();
-    }
-}
