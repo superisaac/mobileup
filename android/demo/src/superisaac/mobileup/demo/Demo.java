@@ -84,6 +84,7 @@ public class Demo extends Activity
     public void onDestroy() {
 	Log.d("Main", "Activity on Destroy");
 	//unbindService(this);
+	stopService();
 	mMobileUp.detach();
 	super.onDestroy();
     }
@@ -94,6 +95,16 @@ public class Demo extends Activity
 	    startService();	    
 	} else {
 	    stopService();
+	}
+    }
+
+    @Override
+    public void onBackPressed() {
+	CustomWebView browser = (CustomWebView)findViewById(R.id.content_view);
+	if(browser.canGoBack()) {
+	    browser.goBack();
+	} else {
+	    super.onBackPressed();
 	}
     }
     public void stopService() {
