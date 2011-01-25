@@ -24,13 +24,34 @@ function sensor_control(anchor) {
     }
 }
 
+var currtrig;
+var canvas;
+var context;
 function on_sensor_demo_init() {
     document.addEventListener("queue.sen.ori", function(evt) {
-        show_board("get sensor " + evt.data[0]);
+        //show_board("get sensor " + evt.data[0]);
+	var angle = parseInt(evt.data[0]);
+	rotate_angle(angle);
     });
     mobileUp.connect();
+
+    canvas = document.getElementById("area-canvas");
+    context = canvas.getContext("2d");
+    context.strokeStyle = "#000";
+    context.fillStyle = "#eee";
+    context.lineWidth = 1;
+
+    currtrig = new trig(new Vector(0, 0), new Vector(-10, 100), new Vector(10, 100));
+    currtrig.moveToXY(canvas.width/2, canvas.height/2);
+    currtrig.draw(context);
 }
 
+function rotate_angle(angle)
+{
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    var ctri = currtrig.rotate(angle);
+    ctri.draw(context);
+}
 
 /** sdcard explorer demo **/
 window.pwd = "";
