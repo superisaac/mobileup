@@ -9,13 +9,13 @@
     </script>
   </head>
 
-  <body onload="on_sensor_demo_init();">
+  <body onload="on_acc_demo_init();">
     <p>
       <a href="/">HOME</a>
-      | Web Sockets Test/Toggle compass sensor
+      | Toggle Gravity sensor
       <a id="command" 
 	 href="javascript:void(0);" 
-	 onclick="sensor_control(this, 'sen.ori'); return false;">Toggle</a>
+	 onclick="sensor_control(this, 'sen.acc'); return false;">Toggle</a>
     </p>
     <div id="working-area">
 	<canvas id="area-canvas" width="300" height="300">

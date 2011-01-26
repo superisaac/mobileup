@@ -6,32 +6,49 @@ function format(fmt) {
     return fmt;
 }
 
-/** orientation sensor demo **/
-function show_board(msg) {
-    var ul = document.getElementById('board');
-    ul.innerHTML = msg;
-}
-
 window.subscribed = false;
-function sensor_control(anchor) {
+function sensor_control(anchor, sensor_type) {
     subscribed = !subscribed;
     if(subscribed) {
-        mobileUp.queue.sub("sen.ori");
+        mobileUp.queue.sub(sensor_type);
         anchor.innerHTML = "Unsub sensor";
     } else {
-        mobileUp.queue.unsub("sen.ori");
+        mobileUp.queue.unsub(sensor_type);
         anchor.innerHTML = "Sub sensor";
     }
 }
 
-var currtrig;
-var canvas;
-var context;
+/** orientation sensor demo **/
 function on_sensor_demo_init() {
+    var trig1 = new trig(new Vector(0, 0), new Vector(-5, 50), new Vector(5, 50));
+    var trig2 = new trig(new Vector(0, 0), new Vector(-5, 50), new Vector(5, 50));
+    var trig3 = new trig(new Vector(0, 0), new Vector(-5, 50), new Vector(5, 50));
+    
+    var canvas;
+    var context;
+    
+    var angle1 = 0;
+    var angle2 = 0;
+    var angle3 = 0;
+
+
+    function draw_angles()
+    {
+	context.fillRect(0, 0, canvas.width, canvas.height);
+	trig1.rotate(angle1).draw(context);
+	trig2.rotate(angle2).draw(context);
+	trig3.rotate(angle3).draw(context);
+    }
+    
     document.addEventListener("queue.sen.ori", function(evt) {
-        //show_board("get sensor " + evt.data[0]);
-	var angle = parseInt(evt.data[0]);
-	rotate_angle(angle);
+	angle1 = parseInt(evt.data[0]);
+	if(evt.data.length > 1) {
+	    angle2 = parseInt(evt.data[1]);
+	    if(evt.data.length > 2) {
+		angle3 = parseInt(evt.data[2]);
+	    }
+	}
+	draw_angles();
     });
     mobileUp.connect();
 
@@ -41,17 +58,53 @@ function on_sensor_demo_init() {
     context.fillStyle = "#eee";
     context.lineWidth = 1;
 
-    currtrig = new trig(new Vector(0, 0), new Vector(-10, 100), new Vector(10, 100));
-    currtrig.moveToXY(canvas.width/2, canvas.height/2);
-    currtrig.draw(context);
+    trig1.moveToXY(canvas.width/4, canvas.height/4);
+    trig1.draw(context);
+
+    trig2.moveToXY(canvas.width * 3/4, canvas.height/4);
+    trig2.draw(context);
+
+    trig3.moveToXY(canvas.width/4, canvas.height * 3/4);
+    trig3.draw(context);
 }
 
-function rotate_angle(angle)
-{
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    var ctri = currtrig.rotate(angle);
-    ctri.draw(context);
+/** Gravity sensor demo */
+function on_acc_demo_init() {
+    var trig1 = new trig(new Vector(0, 0), new Vector(-10, 100), new Vector(10, 100));
+    trig1 = trig1.rotate(270);
+    
+    var canvas;
+    var context;
+    
+    function draw_trig(r)
+    {
+	context.fillRect(0, 0, canvas.width, canvas.height);
+	trig1.rotateRadian(r).draw(context);
+    }
+    
+    document.addEventListener("queue.sen.acc", function(evt) {
+	if(evt.data.length < 3) {
+	    return;
+	}
+	var gx = parseFloat(evt.data[0]);
+	var gy = parseFloat(evt.data[1]);
+	var gz = parseFloat(evt.data[2]);
+
+	var radian = Math.atan2(-gy, -gx);
+	draw_trig(radian);
+    });
+    mobileUp.connect();
+
+    canvas = document.getElementById("area-canvas");
+    context = canvas.getContext("2d");
+    context.strokeStyle = "#000";
+    context.fillStyle = "#eee";
+    context.lineWidth = 1;
+
+    trig1.moveToXY(canvas.width/2, canvas.height/2);
+    trig1.draw(context);
 }
+
 
 /** sdcard explorer demo **/
 window.pwd = "";

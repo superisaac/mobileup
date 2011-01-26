@@ -33,10 +33,13 @@ class SensorQueue extends Queue implements SensorEventListener
     SensorManager sensorManager;
     int sensorType;
 
-    public SensorQueue(SensorManager sensorManager, int sensorType)
+    public String queueName;
+
+    public SensorQueue(SensorManager sensorManager, int sensorType, String name)
     {
 	this.sensorManager = sensorManager;
 	this.sensorType = sensorType;
+	this.queueName = name;
     }
 
     @Override
@@ -57,14 +60,14 @@ class SensorQueue extends Queue implements SensorEventListener
     }
 
     private void startSensor() {
-	Log.d("QriQueue", "start sensor sen.ori");
+	Log.d("QriQueue", "start sensor " + queueName);
 	Sensor sensor = sensorManager.getDefaultSensor(sensorType);
 	sensorManager.registerListener(this, sensor,
 				       SensorManager.SENSOR_DELAY_NORMAL);
     }
     
     public void stopSensor() {
-	Log.d("SensQueue", "stop sensor sen.ori");
+	Log.d("SensQueue", "stop sensor " + queueName);
 	if(sensorManager != null) {
 	    sensorManager.unregisterListener(this);
 	}
@@ -81,7 +84,7 @@ class SensorQueue extends Queue implements SensorEventListener
         for(int i=0; i< values.length; i++) {
             args[i] = String.valueOf(values[i]);
         }
-	put("sen.ori", args);	
+	put(queueName, args);
     }
 
     public void onAccuracyChanged(Sensor sensor, int accuracy)
@@ -134,19 +137,19 @@ public class MobileUpContext extends HandlerFactory
 	return 1;
     }
 
-    private void addSensorQueue(String name, SensorQueue q) {
+    private void addSensorQueue(SensorQueue q) {
 	QueueManager qm = QueueManager.getInstance();
-	Queue oldq = qm.get(name, false);
+	Queue oldq = qm.get(q.queueName, false);
 	if(oldq != null && oldq instanceof SensorQueue) {
 	    ((SensorQueue)oldq).stopSensor();
 	}
-	qm.addQueue(name, q);
+	qm.addQueue(q.queueName, q);
     }
 
-    
     private void prepareQueues() {
-	addSensorQueue("sen.ori",
-		       new SensorQueue(sensorManager, Sensor.TYPE_ORIENTATION));
+	addSensorQueue(new SensorQueue(sensorManager, Sensor.TYPE_ORIENTATION, "sen.ori"));
+	addSensorQueue(new SensorQueue(sensorManager, Sensor.TYPE_ACCELEROMETER, "sen.acc"));
+
     }    
 
     @Override

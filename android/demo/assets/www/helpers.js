@@ -36,6 +36,13 @@ Vector.prototype.rotate = function(dig) {
 		      this.y * cos_t - this.x * sin_t);
 }
 
+Vector.prototype.rotateRadian = function(r) {
+    var cos_t = Math.cos(r);
+    var sin_t = Math.sin(r);
+    return new Vector(this.x * cos_t + this.y * sin_t,
+		      this.y * cos_t - this.x * sin_t);
+}
+
 function trig(v1, v2, v3) {
     this.center = v1.add(v2, v3).mul(1/3);
     this.v1 = v1.minus(this.center);
@@ -51,12 +58,18 @@ trig.prototype.moveTo = function(other) {
     this.center = other;
 }
 
+
 trig.prototype.rotate = function(angle) {
     return new trig(this.v1.rotate(angle).add(this.center),
 		    this.v2.rotate(angle).add(this.center),
 		    this.v3.rotate(angle).add(this.center));
 }
 
+trig.prototype.rotateRadian = function(r) {
+    return new trig(this.v1.rotateRadian(r).add(this.center),
+		    this.v2.rotateRadian(r).add(this.center),
+		    this.v3.rotateRadian(r).add(this.center));
+}
 
 trig.prototype.draw = function(context) {
     var vv1 = this.center.add(this.v1);

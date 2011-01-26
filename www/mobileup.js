@@ -125,7 +125,7 @@ window.mobileUp = (function() {
 	}
 
 	ws.onmessage = function(evt) {
-	    var t = /^([\.\w]+)(( [\.\w]+)*)(\n(.*))?/.exec(evt.data);
+	    var t = /^(\S+)((\s+\S+)*)(\n(.*))?/.exec(evt.data);
 	    if(t) {
 		var msg = new Object();
 		msg.command = t[1];

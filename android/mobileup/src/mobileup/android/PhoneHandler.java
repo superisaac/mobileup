@@ -178,7 +178,6 @@ public class PhoneHandler extends Handler
         int phoneColumn = cur.getColumnIndex(Phone.NUMBER);
 	int rcColumn = cur.getColumnIndex(Data.RAW_CONTACT_ID);
 	int mimeColumn = cur.getColumnIndex(Data.MIMETYPE);
-	Log.d("PhoneHandler", "Columns " + nameColumn + ", " + phoneColumn);
 	JSONArray contactList = new JSONArray();
 	if(cur.moveToFirst()) {
 	    do {
@@ -187,7 +186,6 @@ public class PhoneHandler extends Handler
 		String name = cur.getString(nameColumn);
 		String phone = cur.getString(phoneColumn);
 
-		Log.d("PhoneHandler", "Row " + rawId + ", " + name + ", " + phone);
 		if(mime != null) {
 		    JSONObject entry = new JSONObject();
 		    try {
