@@ -1,3 +1,5 @@
+
+li { padding: 10px 2px; }
 .clear { clear: both; width: 0; height: 0;}
 .center { margin: 0 auto; }
 
@@ -14,3 +16,4 @@
                width: 300px;
                height: 300px;
 }
+
