@@ -69,17 +69,21 @@ function on_sensor_demo_init() {
 }
 
 /** Gravity sensor demo */
+
 function on_acc_demo_init() {
-    var trig1 = new trig(new Vector(0, 0), new Vector(-10, 100), new Vector(10, 100));
-    trig1 = trig1.rotate(270);
-    
+    var timer;
     var canvas;
     var context;
-    
-    function draw_trig(r)
-    {
-	context.fillRect(0, 0, canvas.width, canvas.height);
-	trig1.rotateRadian(r).draw(context);
+    var gravity_radian;
+
+    function draw_gravity(context, g) {
+	var gg = g.normalize(50);
+	context.beginPath();
+	context.arc(canvas.width/2 + gg.x, canvas.height/2 + gg.y, 5, 0, 2 * Math.PI, false);
+	context.moveTo(canvas.width/2, canvas.height/2);
+	context.lineTo(canvas.width/2 + gg.x, canvas.height/2 + gg.y);
+	context.stroke();
+	context.closePath();
     }
     
     document.addEventListener("queue.sen.acc", function(evt) {
@@ -89,20 +93,36 @@ function on_acc_demo_init() {
 	var gx = parseFloat(evt.data[0]);
 	var gy = parseFloat(evt.data[1]);
 	var gz = parseFloat(evt.data[2]);
-
-	var radian = Math.atan2(-gy, -gx);
-	draw_trig(radian);
+	var g = new Vector(-0.5 * gx, 0.5 * gy);
+	if(g.magnitude() > 5) {
+	    g = g.normalize(5);
+	}
+	GROUND.gravity(g);
     });
     mobileUp.connect();
 
     canvas = document.getElementById("area-canvas");
+    GROUND.setSize(canvas.width, canvas.height);
     context = canvas.getContext("2d");
     context.strokeStyle = "#000";
     context.fillStyle = "#eee";
     context.lineWidth = 1;
 
-    trig1.moveToXY(canvas.width/2, canvas.height/2);
-    trig1.draw(context);
+    var ball = new Ball(new Vector(canvas.width / 2, canvas.height/2));
+    ball.velocity = new Vector(3, 5);
+    GROUND.addBall(ball);
+
+    ball = new Ball(new Vector(canvas.width / 2 + 50, canvas.height/2));
+    ball.velocity = new Vector(4, -1);
+    GROUND.addBall(ball);
+
+    timer = setInterval(function() {
+	context.fillRect(0, 0, canvas.width, canvas.height);
+	var g  = GROUND.gravity();
+	draw_gravity(context, g);
+	GROUND.one_step(context);
+    }, 150);
+    console.info("timer ok");
 }
 
 
