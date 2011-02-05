@@ -75,7 +75,7 @@ function on_acc_demo_init() {
     var canvas;
     var context;
     var gravity_radian;
-
+    var GROUND = new Ground();
     function draw_gravity(context, g) {
 	var gg = g.normalize(50);
 	context.beginPath();
@@ -97,7 +97,7 @@ function on_acc_demo_init() {
 	if(g.magnitude() > 5) {
 	    g = g.normalize(5);
 	}
-	GROUND.gravity(g);
+	GROUND.gravity = g;
     });
     mobileUp.connect();
 
@@ -108,19 +108,18 @@ function on_acc_demo_init() {
     context.fillStyle = "#eee";
     context.lineWidth = 1;
 
-    var ball = new Ball(new Vector(canvas.width / 2, canvas.height/2));
+    var ball = new Ball(new Vector(canvas.width / 2, canvas.height/2), 10);
     ball.velocity = new Vector(3, 5);
-    GROUND.addBall(ball);
+    GROUND.addParticle(ball);
 
-    ball = new Ball(new Vector(canvas.width / 2 + 50, canvas.height/2));
+    ball = new Ball(new Vector(canvas.width / 2 + 50, canvas.height/2), 20);
     ball.velocity = new Vector(4, -1);
-    GROUND.addBall(ball);
+    GROUND.addParticle(ball);
 
     timer = setInterval(function() {
 	context.fillRect(0, 0, canvas.width, canvas.height);
-	var g  = GROUND.gravity();
-	draw_gravity(context, g);
-	GROUND.one_step(context);
+	draw_gravity(context, GROUND.gravity);
+	GROUND.oneStep(context);
     }, 150);
     console.info("timer ok");
 }
