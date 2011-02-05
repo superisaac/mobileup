@@ -100,7 +100,7 @@ CollisionDetector.prototype.addFunc = function(cls1, cls2, callback) {
     this.funcMap[name1] = callback;
     var name2 = cls2.prototype.name + '+' + cls1.prototype.name;
     if(name1 != name2) {
-	this.funcMap[name2] = function(p1, p2) { return callback.apply(this, [p2, p1]); };
+	this.funcMap[name2] = function(g, p1, p2) { return callback.apply(this, [g, p2, p1]); };
     }
 }
 
